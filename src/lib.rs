@@ -1,4 +1,4 @@
 #[no_mangle]
-pub fn get_game_state() -> bool {
+pub fn test_fn() -> bool {
     true
 }
