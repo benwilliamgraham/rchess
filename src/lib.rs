@@ -8,7 +8,6 @@ pub enum Color {
 #[repr(u8)]
 #[derive(Copy, Clone)]
 pub enum Kind {
-    Empty,
     Pawn,
     Knight,
     Bishop,
@@ -30,18 +29,16 @@ impl Piece {
         }
     }
 
-    fn is_empty(&self) -> bool {
-        matches!(self.kind, Kind::Empty)
-    }
-
     fn encode(&self) -> u8 {
         self.kind as u8 | (self.color as u8) << 3
     }
 
-    fn decode(encoded: u8) -> Piece {
-        Piece {
+    fn decode(encoded: u8) -> Option<Piece> {
+        if encoded == 0 {
+            return None;
+        }
+        Some(Piece {
             kind: match encoded & 0b111 {
-                0 => Kind::Empty,
                 1 => Kind::Pawn,
                 2 => Kind::Knight,
                 3 => Kind::Bishop,
@@ -51,7 +48,7 @@ impl Piece {
                 _ => panic!("Invalid piece kind"),
             },
             color: if (encoded >> 3) & 0b1 == 0 { Color::White } else { Color::Black },
-        }
+        })
     }
 }
 
