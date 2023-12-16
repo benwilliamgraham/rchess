@@ -40,8 +40,17 @@ impl Piece {
 
     fn decode(encoded: u8) -> Piece {
         Piece {
-            kind: encoded & 0b111,
-            color: (encoded >> 3) & 0b1,
+            kind: match encoded & 0b111 {
+                0 => Kind::Empty,
+                1 => Kind::Pawn,
+                2 => Kind::Knight,
+                3 => Kind::Bishop,
+                4 => Kind::Rook,
+                5 => Kind::Queen,
+                6 => Kind::King,
+                _ => panic!("Invalid piece kind"),
+            },
+            color: if (encoded >> 3) & 0b1 == 0 { Color::White } else { Color::Black },
         }
     }
 }
