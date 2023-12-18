@@ -65,6 +65,25 @@ impl Piece {
     }
 }
 
+struct Square {
+    rank: u8,
+    file: u8,
+}
+
+struct CastlingAvailability {
+    w_kingside: bool,
+    w_queenside: bool,
+    b_kingside: bool,
+    b_queenside: bool,
+}
+
+struct Game {
+    board: [[Option<Piece>; 8]; 8],
+    turn: Color,
+    castling_availability: CastlingAvailability,
+    en_passant: Option<Square>,
+}
+
 #[no_mangle]
 pub fn test_fn() -> bool {
     true
