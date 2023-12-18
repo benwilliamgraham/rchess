@@ -23,10 +23,7 @@ struct Piece {
 
 impl Piece {
     fn new(kind: Kind, color: Color) -> Piece {
-        Piece {
-            kind,
-            color,
-        }
+        Piece { kind, color }
     }
 
     // Encode a piece value into a single byte in FEN format
@@ -75,6 +72,38 @@ struct CastlingAvailability {
     w_queenside: bool,
     b_kingside: bool,
     b_queenside: bool,
+}
+
+enum PieceMovement {
+    Move {
+        from: Square,
+        to: Square,
+    },
+    Capture {
+        from: Square,
+        to: Square,
+        captured: Kind,
+    },
+    Promotion {
+        from: Square,
+        to: Square,
+        promotion: Kind,
+    },
+    EnPassant {
+        from: Square,
+        to: Square,
+        captured: Kind,
+    },
+    Castling {
+        from: Square,
+        to: Square,
+    },
+}
+
+struct Move {
+    piece_movement: PieceMovement,
+    previous_en_passant: Option<Square>,
+    previous_castling_availability: CastlingAvailability,
 }
 
 struct Game {
