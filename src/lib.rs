@@ -29,26 +29,39 @@ impl Piece {
         }
     }
 
-    fn encode(&self) -> u8 {
-        self.kind as u8 | (self.color as u8) << 3
+    // Encode a piece value into a single byte in FEN format
+    fn encode(&self) -> char {
+        let lower_case = match self.kind {
+            Kind::Pawn => 'p',
+            Kind::Knight => 'n',
+            Kind::Bishop => 'b',
+            Kind::Rook => 'r',
+            Kind::Queen => 'q',
+            Kind::King => 'k',
+        };
+        match self.color {
+            Color::White => lower_case.to_ascii_uppercase(),
+            Color::Black => lower_case,
+        }
     }
 
-    fn decode(encoded: u8) -> Option<Piece> {
-        if encoded == 0 {
-            return None;
-        }
-        Some(Piece {
-            kind: match encoded & 0b111 {
-                1 => Kind::Pawn,
-                2 => Kind::Knight,
-                3 => Kind::Bishop,
-                4 => Kind::Rook,
-                5 => Kind::Queen,
-                6 => Kind::King,
-                _ => panic!("Invalid piece kind"),
-            },
-            color: if (encoded >> 3) & 0b1 == 0 { Color::White } else { Color::Black },
-        })
+    // Decode a piece value from a single byte in FEN format
+    fn decode(encoded: char) -> Piece {
+        let lower_case = encoded.to_ascii_lowercase();
+        let kind = match lower_case {
+            'p' => Kind::Pawn,
+            'n' => Kind::Knight,
+            'b' => Kind::Bishop,
+            'r' => Kind::Rook,
+            'q' => Kind::Queen,
+            'k' => Kind::King,
+            _ => panic!("Invalid piece encoding"),
+        };
+        let color = match encoded.is_ascii_uppercase() {
+            true => Color::White,
+            false => Color::Black,
+        };
+        Piece::new(kind, color)
     }
 }
 
