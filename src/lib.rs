@@ -69,6 +69,60 @@ struct Square {
     file: u8,
 }
 
+impl Square {
+    fn new(rank: u8, file: u8) -> Square {
+        Square { rank, file }
+    }
+
+    fn encode(&self) -> String {
+        let mut encoded = String::new();
+        encoded.push((b'a' + self.file) as char);
+        encoded.push((b'1' + self.rank) as char);
+        encoded
+    }
+
+    fn decode(encoded: &str) -> Square {
+        let mut chars = encoded.chars();
+        let file = chars.next().unwrap() as u8 - b'a';
+        let rank = chars.next().unwrap() as u8 - b'1';
+        Square::new(rank, file)
+    }
+}
+
+struct Board {
+    squares: [[Option<Piece>; 8]; 8],
+}
+
+impl Board {
+    fn new() -> Board {
+        Board {
+            squares: [[None; 8]; 8],
+        }
+    }
+
+    fn get(&self, square: Square) -> Option<Piece> {
+        self.squares[square.rank as usize][square.file as usize]
+    }
+
+    fn set(&mut self, square: Square, piece: Option<Piece>) {
+        self.squares[square.rank as usize][square.file as usize] = piece;
+    }
+
+    fn encode(&self) -> String {
+        let mut fen = String::new();
+        // TODO: Implement
+        fen
+    }
+
+    fn decode(fen: &str) -> Board {
+        let mut board = Board::new();
+        let mut rank = 7;
+        let mut file = 0;
+        // TODO: Implement
+        board
+    }
+}
+
 struct CastlingAvailability {
     w_kingside: bool,
     w_queenside: bool,
@@ -102,13 +156,13 @@ enum PieceMovement {
     },
 }
 
-struct Move {
+pub struct Move {
     piece_movement: PieceMovement,
     previous_en_passant: Option<Square>,
     previous_castling_availability: CastlingAvailability,
 }
 
-struct Game {
+pub struct Game {
     board: [[Option<Piece>; 8]; 8],
     turn: Color,
     castling_availability: CastlingAvailability,
