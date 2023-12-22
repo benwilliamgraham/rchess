@@ -1,13 +1,17 @@
+/* This is the chess module.
+ * It's goal is to implement the chess logic.
+ */
+
 #[repr(u8)]
 #[derive(Copy, Clone)]
-pub enum Color {
+enum Color {
     White,
     Black,
 }
 
 #[repr(u8)]
 #[derive(Copy, Clone)]
-pub enum Kind {
+enum Kind {
     Pawn,
     Knight,
     Bishop,
@@ -207,13 +211,13 @@ enum Move {
     },
 }
 
-pub struct MoveWithState {
+struct MoveWithState {
     move_: Move,
     previous_en_passant: Option<Square>,
     previous_castling_availability: CastlingAvailability,
 }
 
-pub struct Game {
+struct Game {
     board: Board,
     turn: Color,
     castling_availability: CastlingAvailability,
