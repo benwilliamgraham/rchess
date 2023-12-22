@@ -181,7 +181,7 @@ impl CastlingAvailability {
     }
 }
 
-enum PieceMovement {
+enum Move {
     Move {
         from: Square,
         to: Square,
@@ -207,8 +207,8 @@ enum PieceMovement {
     },
 }
 
-pub struct Move {
-    piece_movement: PieceMovement,
+pub struct MoveWithState {
+    move_: Move,
     previous_en_passant: Option<Square>,
     previous_castling_availability: CastlingAvailability,
 }
