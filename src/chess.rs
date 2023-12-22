@@ -114,7 +114,27 @@ impl Board {
 
     fn encode(&self) -> String {
         let mut fen = String::new();
-        // TODO: Implement
+        for rank in (0..8).rev() {
+            let mut empty_squares = 0;
+            for file in 0..8 {
+                match self.get(Square::new(rank, file)) {
+                    Some(piece) => {
+                        if empty_squares > 0 {
+                            fen.push_str(&empty_squares.to_string());
+                            empty_squares = 0;
+                        }
+                        fen.push(piece.encode());
+                    }
+                    None => empty_squares += 1,
+                }
+            }
+            if empty_squares > 0 {
+                fen.push_str(&empty_squares.to_string());
+            }
+            if rank > 0 {
+                fen.push('/');
+            }
+        }
         fen
     }
 
