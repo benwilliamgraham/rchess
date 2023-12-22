@@ -130,6 +130,57 @@ struct CastlingAvailability {
     b_queenside: bool,
 }
 
+impl CastlingAvailability {
+    fn new() -> CastlingAvailability {
+        CastlingAvailability {
+            w_kingside: true,
+            w_queenside: true,
+            b_kingside: true,
+            b_queenside: true,
+        }
+    }
+
+    fn encode(&self) -> String {
+        let mut encoded = String::new();
+        if self.w_kingside {
+            encoded.push('K');
+        }
+        if self.w_queenside {
+            encoded.push('Q');
+        }
+        if self.b_kingside {
+            encoded.push('k');
+        }
+        if self.b_queenside {
+            encoded.push('q');
+        }
+        if !self.w_kingside && !self.w_queenside && !self.b_kingside && !self.b_queenside {
+            encoded.push('-');
+        }
+        encoded
+    }
+
+    fn decode(encoded: &str) -> CastlingAvailability {
+        let mut castling_availability = CastlingAvailability::new();
+        for c in encoded.chars() {
+            match c {
+                'K' => castling_availability.w_kingside = true,
+                'Q' => castling_availability.w_queenside = true,
+                'k' => castling_availability.b_kingside = true,
+                'q' => castling_availability.b_queenside = true,
+                '-' => {
+                    castling_availability.w_kingside = false;
+                    castling_availability.w_queenside = false;
+                    castling_availability.b_kingside = false;
+                    castling_availability.b_queenside = false;
+                }
+                _ => panic!("Invalid castling availability encoding"),
+            }
+        }
+        castling_availability
+    }
+}
+
 enum PieceMovement {
     Move {
         from: Square,
