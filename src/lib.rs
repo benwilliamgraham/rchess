@@ -214,7 +214,7 @@ pub struct Move {
 }
 
 pub struct Game {
-    board: [[Option<Piece>; 8]; 8],
+    board: Board,
     turn: Color,
     castling_availability: CastlingAvailability,
     en_passant: Option<Square>,
@@ -223,72 +223,26 @@ pub struct Game {
 impl Game {
     fn new() -> Game {
         Game {
-            board: [[None; 8]; 8],
+            board: Board::new(),
             turn: Color::White,
-            castling_availability: CastlingAvailability {
-                w_kingside: true,
-                w_queenside: true,
-                b_kingside: true,
-                b_queenside: true,
-            },
+            castling_availability: CastlingAvailability::new(),
             en_passant: None,
         }
     }
 
     fn encode(&self) -> String {
         let mut fen = String::new();
-        for rank in (0..8).rev() {
-            let mut empty_squares = 0;
-            for file in 0..8 {
-                match self.board[rank][file] {
-                    Some(piece) => {
-                        if empty_squares > 0 {
-                            fen.push_str(&empty_squares.to_string());
-                            empty_squares = 0;
-                        }
-                        fen.push(piece.encode());
-                    }
-                    None => empty_squares += 1,
-                }
-            }
-            if empty_squares > 0 {
-                fen.push_str(&empty_squares.to_string());
-            }
-            if rank > 0 {
-                fen.push('/');
-            }
-        }
+        fen.push_str(&self.board.encode());
         fen.push(' ');
-        match self.turn {
-            Color::White => fen.push('w'),
-            Color::Black => fen.push('b'),
-        }
+        fen.push(match self.turn {
+            Color::White => 'w',
+            Color::Black => 'b',
+        });
         fen.push(' ');
-        if self.castling_availability.w_kingside {
-            fen.push('K');
-        }
-        if self.castling_availability.w_queenside {
-            fen.push('Q');
-        }
-        if self.castling_availability.b_kingside {
-            fen.push('k');
-        }
-        if self.castling_availability.b_queenside {
-            fen.push('q');
-        }
-        if !self.castling_availability.w_kingside
-            && !self.castling_availability.w_queenside
-            && !self.castling_availability.b_kingside
-            && !self.castling_availability.b_queenside
-        {
-            fen.push('-');
-        }
+        fen.push_str(&self.castling_availability.encode());
         fen.push(' ');
         match self.en_passant {
-            Some(square) => {
-                fen.push((b'a' + square.file) as char);
-                fen.push((b'1' + square.rank) as char);
-            }
+            Some(square) => fen.push_str(&square.encode()),
             None => fen.push('-'),
         }
         fen.push_str(" 0 1");
