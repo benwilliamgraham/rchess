@@ -282,8 +282,22 @@ impl Game {
     fn make_move(&mut self, move_: Move) -> MoveWithState {
         let previous_en_passant = self.en_passant;
         let previous_castling_availability = self.castling_availability;
+        fn update_en_passant(piece: Piece, from: Square, to: Square) -> Option<Square> {
+            match piece.kind {
+                Kind::Pawn => {
+                    if (from.rank as i8 - to.rank as i8).abs() == 2 {
+                        Some(from)
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            }
+        }
         match move_ {
             Move::Move { from, to } => {
+                let piece = self.board.get(from).unwrap();
+                update_en_passant(piece, from, to);
                 self.board.set(to, self.board.get(from));
                 self.board.set(from, None);
             }
@@ -292,6 +306,8 @@ impl Game {
                 to,
                 captured,
             } => {
+                let piece = self.board.get(from).unwrap();
+                update_en_passant(piece, from, to);
                 self.board.set(to, self.board.get(from));
                 self.board.set(from, None);
             }
