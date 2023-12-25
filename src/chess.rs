@@ -371,4 +371,55 @@ impl Game {
             previous_castling_availability,
         }
     }
+
+    fn undo_move(&mut self, move_with_state: MoveWithState) {
+        self.en_passant = move_with_state.previous_en_passant;
+        self.castling_availability = move_with_state.previous_castling_availability;
+        match move_with_state.move_ {
+            Move::Move { from, to } => {
+                self.board.set(from, self.board.get(to));
+                self.board.set(to, None);
+            }
+            Move::Capture {
+                from,
+                to,
+                captured,
+            } => {
+                self.board.set(from, self.board.get(to));
+                self.board.set(to, Some(Piece::new(captured, self.turn)));
+            }
+            Move::Promotion {
+                from,
+                to,
+                promotion,
+            } => {
+                self.board.set(from, Some(Piece::new(Kind::Pawn, self.turn)));
+                self.board.set(to, Some(Piece::new(promotion, self.turn)));
+            }
+            Move::EnPassant {
+                from,
+                to,
+                captured,
+            } => {
+                self.board.set(from, self.board.get(to));
+                self.board.set(to, None);
+                self.board.set(Square::new(to.rank, from.file), Some(Piece::new(captured, self.turn)));
+            }
+            Move::Castling { from, to } => {
+                self.board.set(from, self.board.get(to));
+                self.board.set(to, None);
+                match to.file {
+                    2 => {
+                        self.board.set(Square::new(to.rank, 3), self.board.get(Square::new(to.rank, 0)));
+                        self.board.set(Square::new(to.rank, 0), None);
+                    }
+                    6 => {
+                        self.board.set(Square::new(to.rank, 5), self.board.get(Square::new(to.rank, 7)));
+                        self.board.set(Square::new(to.rank, 7), None);
+                    }
+                    _ => panic!("Invalid castling move"),
+                }
+            }
+        }
+    }
 }
