@@ -147,6 +147,7 @@ impl Board {
     }
 }
 
+#[derive(Copy, Clone)]
 struct CastlingAvailability {
     w_kingside: bool,
     w_queenside: bool,
@@ -276,5 +277,61 @@ impl Game {
     fn decode(fen: &str) -> Game {
         let mut game = Game::new();
         game
+    }
+
+    fn make_move(&mut self, move_: Move) -> MoveWithState {
+        let previous_en_passant = self.en_passant;
+        let previous_castling_availability = self.castling_availability;
+        match move_ {
+            Move::Move { from, to } => {
+                self.board.set(to, self.board.get(from));
+                self.board.set(from, None);
+            }
+            Move::Capture {
+                from,
+                to,
+                captured,
+            } => {
+                self.board.set(to, self.board.get(from));
+                self.board.set(from, None);
+            }
+            Move::Promotion {
+                from,
+                to,
+                promotion,
+            } => {
+                self.board.set(to, Some(Piece::new(promotion, self.turn)));
+                self.board.set(from, None);
+            }
+            Move::EnPassant {
+                from,
+                to,
+                captured,
+            } => {
+                self.board.set(to, self.board.get(from));
+                self.board.set(from, None);
+                self.board.set(Square::new(to.rank, from.file), None);
+            }
+            Move::Castling { from, to } => {
+                self.board.set(to, self.board.get(from));
+                self.board.set(from, None);
+                match to.file {
+                    2 => {
+                        self.board.set(Square::new(to.rank, 3), self.board.get(Square::new(to.rank, 0)));
+                        self.board.set(Square::new(to.rank, 0), None);
+                    }
+                    6 => {
+                        self.board.set(Square::new(to.rank, 5), self.board.get(Square::new(to.rank, 7)));
+                        self.board.set(Square::new(to.rank, 7), None);
+                    }
+                    _ => panic!("Invalid castling move"),
+                }
+            }
+        }
+        MoveWithState {
+            move_,
+            previous_en_passant,
+            previous_castling_availability,
+        }
     }
 }
