@@ -3,14 +3,14 @@
  */
 
 #[repr(u8)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 enum Color {
     White,
     Black,
 }
 
 #[repr(u8)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 enum Kind {
     Pawn,
     Knight,
@@ -20,7 +20,7 @@ enum Kind {
     King,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 struct Piece {
     kind: Kind,
     color: Color,
@@ -327,6 +327,27 @@ impl Game {
                     _ => panic!("Invalid castling move"),
                 }
             }
+        }
+        // Update castling availability
+        if self.board.get(Square::new(7, 4)) != Some(Piece::new(Kind::King, Color::White)) {
+            self.castling_availability.w_kingside = false;
+            self.castling_availability.w_queenside = false;
+        }
+        if self.board.get(Square::new(7, 0)) != Some(Piece::new(Kind::Rook, Color::White)) {
+            self.castling_availability.w_queenside = false;
+        }
+        if self.board.get(Square::new(7, 7)) != Some(Piece::new(Kind::Rook, Color::White)) {
+            self.castling_availability.w_kingside = false;
+        }
+        if self.board.get(Square::new(0, 4)) != Some(Piece::new(Kind::King, Color::Black)) {
+            self.castling_availability.b_kingside = false;
+            self.castling_availability.b_queenside = false;
+        }
+        if self.board.get(Square::new(0, 0)) != Some(Piece::new(Kind::Rook, Color::Black)) {
+            self.castling_availability.b_queenside = false;
+        }
+        if self.board.get(Square::new(0, 7)) != Some(Piece::new(Kind::Rook, Color::Black)) {
+            self.castling_availability.b_kingside = false;
         }
         MoveWithState {
             move_,
